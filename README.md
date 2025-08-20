@@ -1,7 +1,5 @@
 # 🌍 Coordinate Converter Tool
-# By Dr. Ali Abbas
-# aabbas7@gmail.com
-# 2025
+# By Dr. Ali Abbas aabbas7@gmail.com
 
 A minimal web tool to convert geospatial coordinates between:
 - **WGS84/Elipsoid** (latitude, longitude, altitude)
