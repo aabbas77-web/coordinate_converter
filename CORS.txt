@@ -1,0 +1,45 @@
+? Option 1: Using venv (recommended for quick local testing)
+Step 1: Create a new virtual environment
+Open your terminal / PowerShell and run:
+
+bash
+Copy code
+python -m venv myenv
+This creates a folder called myenv containing a clean Python installation.
+
+Step 2: Activate the virtual environment
+On Windows:
+
+bash
+Copy code
+myenv\Scripts\activate
+On macOS / Linux:
+
+bash
+Copy code
+source myenv/bin/activate
+You should see your prompt change to something like:
+
+scss
+Copy code
+(myenv) C:\Users\you\project>
+Step 3: Upgrade pip (optional but recommended)
+bash
+Copy code
+pip install --upgrade pip
+Step 4: Install your project requirements
+bash
+Copy code
+pip install -r requirements.txt
+Step 5: Run your Python code
+Now you can run your script (e.g.):
+
+bash
+Copy code
+python app.py
+The code runs inside this clean environment, completely separate from your system Python.
+
+Step 6: Deactivate when done
+bash
+Copy code
+deactivate

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coordinate Converter</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.8.0/proj4.js"></script>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+  h2 { text-align: center; }
+  label { display: block; margin-top: 10px; }
+  input { width: 100%; padding: 8px; margin-top: 5px; }
+  button { margin-top: 15px; padding: 10px; width: 100%; }
+  pre { background: #f3f3f3; padding: 10px; }
+</style>
+</head>
+<body>
+<h2>Coordinate Converter</h2>
+
+<div>
+  <label>Latitude:</label>
+  <input type="number" id="lat" placeholder="e.g. -33.865143" value="34.126801">
+
+  <label>Longitude:</label>
+  <input type="number" id="lon" placeholder="e.g. 151.209900" value="56.274228">
+
+  <label>Altitude (Ellipsoid):</label>
+  <input type="number" id="alt" placeholder="e.g. 50" value="760">
+
+  <button onclick="convertToUTM()">Convert to UTM40S/Orthometric</button>
+</div>
+
+<div>
+  <label>Easting:</label>
+  <input type="number" id="easting" placeholder="">
+
+  <label>Northing:</label>
+  <input type="number" id="northing" placeholder="">
+
+  <label>Altitude (Orthometric):</label>
+  <input type="number" id="alt2" placeholder="">
+
+  <button onclick="convertToWGS()">Convert to WGS84/Elipsoid</button>
+</div>
+
+<h3>Result:</h3>
+<pre id="result"></pre>
+
+<script>
+proj4.defs([
+  ['WGS84', '+proj=longlat +datum=WGS84 +no_defs'],
+  ['UTM40S', '+proj=utm +zone=40 +south +datum=WGS84 +units=m +no_defs']
+]);
+
+async function convertToUTM() {
+  const lat = parseFloat(document.getElementById('lat').value);
+  const lon = parseFloat(document.getElementById('lon').value);
+  const alt = parseFloat(document.getElementById('alt').value);
+
+  if (isNaN(lat) || isNaN(lon) || isNaN(alt)) {
+    document.getElementById('result').textContent = 'Please enter valid numbers.';
+    return;
+  }
+
+  const [easting, northing] = proj4('WGS84', 'UTM40S', [lon, lat]);
+
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/geoid_height?lat=${lat}&lon=${lon}`);
+    const data = await response.json();
+    const orthometricAlt = alt - data.geoid_height;
+
+    document.getElementById('easting').value = easting.toFixed(3);
+    document.getElementById('northing').value = northing.toFixed(3);
+    document.getElementById('alt2').value = orthometricAlt.toFixed(3);
+
+    document.getElementById('result').textContent = `UTM40S: Easting: ${easting.toFixed(3)}, Northing: ${northing.toFixed(3)}, Orthometric Alt: ${orthometricAlt.toFixed(3)}`;
+  } catch (error) {
+    document.getElementById('result').textContent = 'Error fetching geoid height.';
+  }
+}
+
+async function convertToWGS() {
+  const easting = parseFloat(document.getElementById('easting').value);
+  const northing = parseFloat(document.getElementById('northing').value);
+  const orthometricAlt = parseFloat(document.getElementById('alt2').value);
+
+  if (isNaN(easting) || isNaN(northing) || isNaN(orthometricAlt)) {
+    document.getElementById('result').textContent = 'Please enter valid numbers.';
+    return;
+  }
+
+  const [lon, lat] = proj4('UTM40S', 'WGS84', [easting, northing]);
+
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/geoid_height?lat=${lat}&lon=${lon}`);
+    const data = await response.json();
+    const ellipsoidAlt = orthometricAlt + data.geoid_height;
+
+    document.getElementById('lat').value = lat.toFixed(6);
+    document.getElementById('lon').value = lon.toFixed(6);
+    document.getElementById('alt').value = ellipsoidAlt.toFixed(3);
+
+    document.getElementById('result').textContent = `WGS84: Latitude: ${lat.toFixed(6)}, Longitude: ${lon.toFixed(6)}, Ellipsoid Alt: ${ellipsoidAlt.toFixed(3)}`;
+  } catch (error) {
+    document.getElementById('result').textContent = 'Error fetching geoid height.';
+  }
+}
+</script>
+</body>
+</html>
