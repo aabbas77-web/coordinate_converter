@@ -9,7 +9,7 @@ A minimal web tool to convert geospatial coordinates between:
 Includes geoid correction for accurate altitude transformation.
 
 ---
-[![Coordinate Converter Tool](https://github.com/aabbas77-web/Halftone-Maker/releases/download/FirstRelease/HalftoneVideo.png)](https://www.youtube.com/watch?v=ecGTu8sCbYQ)
+[![Coordinate Converter Tool](https://github.com/aabbas77-web/coordinate_converter/releases/download/FirstRelease/coordinates_converter_video.png)](https://www.youtube.com/shorts/7ENXtjeHhK0)
 
 ## ⚙️ Features
 ✅ Convert coordinates between systems  
